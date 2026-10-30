@@ -38,7 +38,7 @@ if(document.getElementById("page-iconMaker")){
     let gifeditorData=[];
     parentArea.style.display="none";
     parentArea.classList.add("iconMaker");
-    form.innerHTML=toInnerHTML(`<div class="group">
+    form.innerHTML=toInnerHTML(`<span style="font-size:2em;font-weight:bold;">【暫定版】</span><br><div class="group">
         <div class="meta">使い方</div>
         1. モードを選択してください。幅及び高さの最大は100pxです。<br>
         2. プレビューを確認しながらツールなどを用いて描画してください。<br> 
