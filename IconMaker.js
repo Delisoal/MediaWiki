@@ -7,7 +7,7 @@ if(document.getElementById("page-iconMaker")){
     }
     (function(){
 		let link=document.createElement("link");
-		link.href="https://cdn.jsdelivr.net/gh/Delisoal/MediaWiki/IconMaker.css";
+		link.href="https://cdn.jsdelivr.net/gh/Delisoal/MediaWiki@main/IconMaker.css";
 		link.rel="stylesheet";
 		document.querySelector("head").appendChild(link);
         ["https://cdn.jsdelivr.net/gh/TakeshiOkamoto/GIFAnime.js/GIFAnime.js","https://cdn.jsdelivr.net/npm/omggif@1.0.10/omggif.js"].forEach(function(url){
