@@ -310,7 +310,7 @@ if(document.getElementById("page-iconMaker")){
         id("pixSizeValue").value=e.target.value;
     }
     id("pixSizeValue").oninput=function(e){
-        id("pixSize").value=e.target.value;
+        id("pixSize").value=e.tafrget.value;
     }
     id("clearCanvas").onclick=async function(){
         if(confirm("本当にリセットしますか？")){
@@ -646,7 +646,7 @@ if(document.getElementById("page-iconMaker")){
         a.download=id("fileName").value+".png";
         a.click();
     };
-    if(mw&&mw.Api&&OO){
+    if(typeof mw!=="undefined"&&mw.Api&&OO){
         let uploadButton=document.createElement("input");
         uploadButton.type="button";
         uploadButton.value="このwikiにアップロード";
