@@ -1,0 +1,107 @@
+.iconMaker{
+    display:block !important;
+    background:white;
+    box-sizing:border-box;
+    padding:1em 2em;
+}
+.canvasarea{
+    position:relative;
+    background-image:
+        linear-gradient(45deg, #c9ced2 25%, transparent 25%),
+        linear-gradient(-45deg, #c9ced2 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #c9ced2 75%),
+        linear-gradient(-45deg, transparent 75%, #c9ced2 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    margin:1em;
+}
+.bg{
+    position:absolute;
+    top:0;
+    left:0;
+}
+.group{
+    border:1px solid black;
+    box-sizing:border-box;
+    margin:1em;
+    padding:1em 0.5em;
+}
+.meta{
+    font-weight:bold;
+}
+.popupConfirm{
+    position:fixed;
+    background:rgba(0,0,0,0.6);
+    width:100%;
+    height:100vh;
+    top:0;
+    left:0;
+    z-index:9999;
+    text-align:start;
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+.popupConfirm.open{
+    display:flex;
+}
+.main{
+    background:white;
+    box-sizing:border-box;
+    padding:1em 2em;
+}
+.gifeditor-main{
+    width:90%;
+    height:90%;
+    overflow-y:auto;
+}
+.gifeditor-imagesItem{
+    border:solid 1px black;
+    padding:0.5em 1em;
+    display:flex;
+    margin:1em;
+}
+.gifeditor-thumb img{
+    height:5em;
+}
+#gifeditor-appendImageLabel,.gifeditor-changeIndex,.gifeditor-putData,.gifeditor-dup{
+    color:blue;
+    cursor:pointer;
+    text-decoration:underline;
+}
+.gifeditor-delete{
+    color:red;
+    cursor:pointer;
+    font-weight:bold;
+}
+.flowArea{
+    background:rgba(0,0,0,0.6);
+    color:white;
+}
+.canvasarea div{
+    top:0;
+}
+.palletItem{
+    width:2em;
+    height:2em;
+    border:black solid 1px;
+    display:inline-block;
+    cursor:pointer;
+    margin:2px;
+}
+input[type="radio"]{
+    display:none;
+}
+label{
+    display:inline-block;
+    margin:0.2em 0.5em;
+    border:solid 1px black;
+    cursor:pointer;
+    background:white;
+    padding:0.2em 0.4em;
+}
+input[type="radio"]:checked + label{
+    font-weight:bold;
+    color:white;
+    background:black;
+}
