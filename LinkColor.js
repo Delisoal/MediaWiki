@@ -6,7 +6,11 @@
             aurora:"aurora 4s linear infinite",
             pop:"pop 2s linear infinite",
             shake:"shake  0.15s infinite alternate",
-            glitch:"glitch 0.3s infinite alternate"
+            glitch:"glitch 0.3s infinite alternate",
+            noise:"noise 10s infinite",
+            electric:"electric 3s infinite",
+            rainbow:"rainbow 2s linear infinite",
+            fire:"fireGlow 1.5s ease-in-out infinite alternate"
         };
         return type.split(",").map(function(data){return animationObj[data]||""}).filter(function(data){return data!=""}).join(",")||"";
     }
@@ -17,7 +21,7 @@
                 if(i!=0){
                     let data=fullData.split("==");
                     let cssNormal=cssHover=cssDarkmode=cssDarkmodeHover=cssEffect="";
-                    let UserName="/wiki/"+encodeURI(data[0].replaceAll(" ","_").replaceAll("[[","").replaceAll("]]",""));
+                    let UserName="/wiki/"+encodeURI(data[0].replaceAll(" ","_").replaceAll("[[","").replaceAll("]]","")).replaceAll("?","%3F");
                     data[1].split(";")?.forEach(function(cssData){
                         let cssObj=cssData.split(":");
                         if(cssObj[0].indexOf("effect-color")!=-1){
@@ -42,12 +46,16 @@
                             cssNormal+=`${cssObj[0]}:${cssObj[1]};\n--normal-${cssData};`;
                         }
                     });
-                    cssText+=`#mw-content a[href$="${UserName}"]{${cssNormal};--rev-color:var(--darkmode---theme-link-color)}\n.client-darkmode #mw-content a[href$="${UserName}"]{${cssDarkmode};--rev-color:var(--normal---theme-link-color)}\n#mw-content a[href$="${UserName}"]:hover{${cssHover}}\n.client-darkmode #mw-content a[href$="${UserName}"]:hover{${cssDarkmodeHover}}\n`;
+                    cssText+=`#mw-content a[href$="${UserName}"]{${cssNormal};--rev-color:var(--darkmode---theme-link-color);text-decoration:inherit;}\n.client-darkmode #mw-content a[href$="${UserName}"]{${cssDarkmode};--rev-color:var(--normal---theme-link-color)}\n#mw-content a[href$="${UserName}"]:hover{${cssHover}}\n.client-darkmode #mw-content a[href$="${UserName}"]:hover{${cssDarkmodeHover}}\n`;
                 }
             });
-            cssText+=`
+            let animationCss=`
+.svgTemplate{
+    display:none;
+}
 #mw-content a:not(.visible){
     animation-play-state:paused;
+    filter:none !important;
 }
 #mw-content a.visible{
     animation-play-state:running;
@@ -135,10 +143,107 @@
 	100%{
 		text-shadow:0.05em 0 cyan,-0.05em 0 red;
 	}
+}
+@keyframes noise{
+	0%,100%{
+		filter:url(#noise);
+		font-weight:bold;
+	}
+}
+@keyframes electric{
+	0%,45%,53%,100%{
+		text-shadow:none;
+    	filter:url(#electric);
+	    font-weight:700;
+    	display:inline-block;
+        background:var(--normal-background-image,var(--normal-background,var(--normal-background-color,black)));
+    	padding:0.1em 0.4em;
+		border-radius:0.1em;
+	}
+	46%{
+		text-shadow:-2px 0 #7df9ff,2px 0 white,0 0 10px #00ffff;
+	}
+	48%{
+		text-shadow:2px -1px #7df9ff,-2px  1px white,0 0 18px cyan;
+	}
+	50%{
+		text-shadow:-3px 2px white,3px -2px #7df9ff,0 0 25px #00ffff,0 0 35px white;
+	}
+	52%{
+		text-shadow:none;
+	}
+}
+@keyframes rainbow{
+	0%,100%{
+		background:linear-gradient(to right,red,orange,gold,green,blue,indigo,purple,red);
+		color:transparent;
+		-webkit-background-clip:text;
+		background-size:200% 100%;
+	}
+	0%{
+		background-position:0% 0%;
+	}
+	100%{
+		background-position:-200% 0%;
+	}
+}
+@keyframes fireGlow{
+	0%,100%{
+		font-weight:700;
+		display:inline-block;
+		background:linear-gradient(to bottom,black,oklch(from var(--animation-color,orange) calc(l - 0.156) calc(c + 0.078) calc(h - 39.8)),var(--animation-color,orange));
+		-webkit-background-clip:text;
+		background-size:auto 200%;
+    		padding:0.1em 0.4em;
+		color:transparent;
+		border-radius:0.1em;
+		filter:url(#fire);
+	}
+	from{
+		text-shadow:0 0 6px oklch(from var(--animation-color,orange) calc(l - 0.074) calc(c + 0.021) calc(h - 21.3)),0 -2px 10px oklch(from var(--animation-color,orange) calc(l - 0.117) calc(c + 0.046) calc(h - 31.9)),0 -5px 20px oklch(from var(--animation-color,orange) calc(l - 0.133) calc(c + 0.059) calc(h - 35.4));
+		background-position:0% 90%;
+	}
+	to{
+		text-shadow:0 0 10px oklch(from var(--animation-color,orange) calc(l + 0.183) calc(c - 0.029) calc(h + 38.1)),0 -8px 25px var(--animation-color,orange),0 -16px 40px oklch(from var(--animation-color,orange) calc(l - 0.157) calc(c + 0.079) calc(h - 40.1));
+		background-position:0% 50%;
+	}
+
 }`;
             let styleEl=document.createElement("style");
+            let animationStyleEl=document.createElement("style");
+            let svgArray=[`
+<filter id="noise">
+    <feTurbulence type="turbulence" baseFrequency=".9 .04" numOctaves="1" seed="2" result="noise">
+        <animate attributeName="baseFrequency" values=".8 .03;1.2 .06;.6 .02;1 .04;.8 .03" dur=".06s" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="0">
+        <animate attributeName="scale" values="0;0;6;0;0;9;0" dur="1.8s" repeatCount="indefinite"/>
+    </feDisplacementMap>
+</filter>`,`
+<filter id="electric">
+    <feTurbulence type="turbulence" baseFrequency="0 0" numOctaves="1" seed="2" result="electric">
+        <animate attributeName="baseFrequency" values=".8 .03;1.2 .06;.6 .02;1 .04;.8 .03" dur=".06s" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feDisplacementMap in="SourceGraphic" in2="electric" scale="0">
+        <animate attributeName="scale" values="0;0;0;0;0;2;0" dur="1.8s" repeatCount="indefinite"/>
+    </feDisplacementMap>
+</filter>`,`
+<filter id="fire" x="-40%" y="-100%" width="180%" height="250%">
+    <feTurbulence type="fractalNoise" baseFrequency=".015 .25" numOctaves="2" seed="2" result="noise">
+        <animate attributeName="baseFrequency" values=".015 .22;.020 .28;.012 .24;.018 .26;.015 .22" dur=".25s" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="B"/>
+</filter>`];
             styleEl.textContent=cssText;
+            animationStyleEl.textContent=animationCss;
             document.querySelector("head").appendChild(styleEl);
+            document.querySelector("head").appendChild(animationStyleEl);
+            svgArray.forEach(function(svgTextContent){
+                let svgElement=document.createElementNS("http://www.w3.org/2000/svg","svg");
+                svgElement.innerHTML=svgTextContent;
+                svgElement.classList.add("svgTemplate");
+                document.body.appendChild(svgElement);
+            });
         }
     });
     let io=new IntersectionObserver(function(entries){
@@ -187,7 +292,22 @@
         }
         li.innerHTML=`<a title="アニメーションを${myStorage}にする" id="pt-animation-main">アニメーションを<span id="pt-animation-ms">${myStorage}</span></a>`;
         li.id="pt-animation";
-        myStorage=="ON"?document.body.classList.add("no-animation"):document.body.classList.remove("no-animation");
+        if(myStorage=="ON"){
+            document.body.classList.add("no-animation");
+            document.querySelectorAll(".svgTemplate").forEach(function(svgElement){
+                svgElement.pauseAnimations();
+            });
+        }
+        else{
+            document.body.classList.remove("no-animation");
+            document.querySelectorAll(".svgTemplate").forEach(function(svgElement){
+                svgElement.unpauseAnimations();
+            });
+            document.querySelectorAll("#mw-content a").forEach(function(element){
+                io.unobserve(element);
+                io.observe(element);
+            });
+        }
         document.querySelector(".cosmos-personalTools-list ul").appendChild(li);
         li.onclick=function(){
             if(!li.classList.contains("clicked")){
@@ -201,7 +321,22 @@
                 document.getElementById("pt-animation-ms").innerHTML=myStorage;
                 document.getElementById("pt-animation-main").title=`アニメーションを${myStorage}にする`;
                 localStorage.setItem("animation",myStorage);
-                localStorage.getItem("animation")=="ON"?document.body.classList.add("no-animation"):document.body.classList.remove("no-animation");
+                if(localStorage.getItem("animation")=="ON"){
+                    document.body.classList.add("no-animation");
+                    document.querySelectorAll(".svgTemplate").forEach(function(svgElement){
+                        svgElement.pauseAnimations();
+                    });
+                }
+                else{
+                    document.body.classList.remove("no-animation");
+                    document.querySelectorAll(".svgTemplate").forEach(function(svgElement){
+                        svgElement.unpauseAnimations();
+                    });
+                    document.querySelectorAll("#mw-content a").forEach(function(element){
+                        io.unobserve(element);
+                        io.observe(element);
+                    });
+                }
                 let getInnerHTML=document.getElementById("pt-animation-main").innerHTML;
                 document.getElementById("pt-animation-main").innerHTML="処理中…";
                 setTimeout(function(){
