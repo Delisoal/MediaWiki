@@ -1,108 +1,270 @@
-.iconMaker{
-    display:block !important;
-    background:white;
-    box-sizing:border-box;
-    padding:1em 2em;
+form{
+    margin:0;
 }
-.canvasarea{
-    position:relative;
-    background-image:
-        linear-gradient(45deg, #c9ced2 25%, transparent 25%),
-        linear-gradient(-45deg, #c9ced2 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #c9ced2 75%),
-        linear-gradient(-45deg, transparent 75%, #c9ced2 75%);
-    background-size: 20px 20px;
-    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
-    margin:1em;
-    overflow:auto;
+.iconMaker{
+    background:white;
+	display:block !important;
+	padding:4px 0;
+	font-size:0.9em;
+	--theme-text-color:black;
+	color:black;
+}
+.iconMaker.gifeditor-parent{
+	visibility:hidden;
+	text-align:start;
+	position:absolute;
+}
+.canvas{
+    background:linear-gradient(45deg,#dedede 25%,rgba(239,239,239,0) 25%,rgba(239,239,239,0) 75%,#dedede 75%,#dedede),linear-gradient(45deg,#dedede 25%,rgba(239,239,239,0) 25%,rgba(239,239,239,0) 75%,#dedede 75%,#dedede),#bcbcbc;
+    background-position:0 0,10px 10px;
+    background-size:21px 21px;
+    display:block;
+    position:absolute;
+    z-index:0;
 }
 .bg{
     position:absolute;
-    top:0;
-    left:0;
+    z-index:1;
+    display:block;
 }
-.group{
-    border:1px solid black;
-    box-sizing:border-box;
-    margin:1em;
-    padding:1em 0.5em;
-}
-.meta{
-    font-weight:bold;
-}
-.popupConfirm{
-    position:fixed;
-    background:rgba(0,0,0,0.6);
-    width:100%;
-    height:100vh;
-    top:0;
-    left:0;
-    z-index:9999;
-    text-align:start;
-    display:none;
-    justify-content:center;
-    align-items:center;
-}
-.popupConfirm.open{
-    display:flex;
-}
-.main{
+.canvasarea{
+    position:relative;
     background:white;
-    box-sizing:border-box;
-    padding:1em 2em;
-}
-.gifeditor-main{
-    width:90%;
-    height:90%;
-    overflow-y:auto;
-}
-.gifeditor-imagesItem{
-    border:solid 1px black;
-    padding:0.5em 1em;
-    display:flex;
-    margin:1em;
-}
-.gifeditor-thumb img{
-    height:5em;
-}
-#gifeditor-appendImageLabel,.gifeditor-changeIndex,.gifeditor-putData,.gifeditor-dup{
-    color:blue;
-    cursor:pointer;
-    text-decoration:underline;
-}
-.gifeditor-delete{
-    color:red;
-    cursor:pointer;
-    font-weight:bold;
+    margin-left:7.5%;
+    border:solid 1px #dedede;
+    overflow-x:auto;
+    width:85%;
+	height:60vh;
+	transition:max-width 0.2s,max-height 0.2s;
 }
 .flowArea{
-    background:rgba(0,0,0,0.6);
+    background:rgba(0,0,0,0.7);
+    font-size:2em;
     color:white;
+    text-align:center;
 }
-.canvasarea div{
-    top:0;
+#palletItem{
+	display:inline-block;
+	min-height:4em;
+	max-width:80%;
+	overflow-x:auto;
+	text-wrap:nowrap;
 }
 .palletItem{
     width:2em;
     height:2em;
-    border:black solid 1px;
+    border:solid 1px black;
+    outline:solid 1px white;
     display:inline-block;
     cursor:pointer;
-    margin:2px;
+    margin:1px;
+    border-radius:6px;
 }
-input[type="radio"]{
+.cr{
+    position:absolute;
+    z-index:3;
+    border:solid 1px black;
+    outline:solid 1px white;
     display:none;
 }
-label{
-    display:inline-block;
-    margin:0.2em 0.5em;
-    border:solid 1px black;
-    cursor:pointer;
-    background:white;
-    padding:0.2em 0.4em;
+.group{
+    border:solid 1px #dedede;
+    border-radius:8px;
+    background:#f5f5f7;
+    padding:8px;
+    margin:8px;
 }
-input[type="radio"]:checked + label{
-    font-weight:bold;
+.iconMaker input[type="radio"]{
+    display:none;
+}
+.iconMaker label,.iconMaker input[type="button"]{
+    display:inline-block;
+    background:white;
+    border:solid 1px #dddddd;
+    border-radius:8px;
+    cursor:pointer;
+    padding:6px 10px;
+    margin:2px;
+    font-weight:normal;
+    box-shadow:none !important;
+}
+.iconMaker input[type="button"]:disabled{
+	opacity:0.5;
+	pointer-events:none;
+}
+.meta{
+    font-size:0.8em;
+    color:#596067;
+    margin-bottom:8px;
+}
+.iconMaker input[type="radio"]:checked+label,.iconMaker input[type="button"].accent,.iconMaker input[type="button"].accent:hover{
+    background:var(--theme-main-bg-color);
+    border-color:var(--theme-main-bg-color);
     color:white;
-    background:black;
+}
+.iconMaker input[type="button"]:hover,.iconMaker label:hover{
+    background:#eeeeee;
+}
+#downloadImage{
+    margin-left:1em;
+}
+#pxColor,#colorValue,.label-item{
+    margin-right:1em;
+}
+.popupConfirm{
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background:rgba(0, 0, 0, 0.7);
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	z-index:5000;
+	opacity:0;
+	transition:opacity 0.1s,visibility 0s 0.1s;
+	visibility:hidden;
+}
+.popupConfirm.open{
+	visibility:visible;
+	opacity:1;
+	transition:opacity 0.2s;
+}
+.popupConfirm .main{
+	position:relative;
+    background:white;
+    border-radius:5px;
+    padding:1em 2em;
+    box-sizing:border-box;
+    top:-20px;
+    transition:top 0.1s;
+}
+.gifeditor-main{
+    width:90vw;
+    height:90vh;
+}
+.appendSelect{
+	width:50vw;
+    height:20em;
+}
+.popupConfirm.open .main{
+	top:0;
+	transition:top 0.2s;
+}
+.gifeditor-flexParent{
+	display:flex;
+    flex-wrap:wrap;
+    justify-content:space-around;
+    width:100%;
+    height:80%;
+	overflow-y:auto;
+}
+.gifeditor-imagesColumn{
+	display:flex;
+    flex-direction:column;
+    width:60%;
+    height:100%;
+    overflow-y:auto;
+	padding: 1em 0.5em;
+    box-sizing: border-box;
+    border-radius: 8px;
+	font-size:min(1em,2.5vw);
+}
+.gifeditor-imagesColumn input{
+	font-size:calc(min(1em,2.5vw) * 0.9);
+}
+.gifeditor-main .group{
+	width:30%;
+}
+.gifeditor-imagesItem,#gifeditor-appendImage{
+	border:solid 1px #dedede;
+    min-height:7em;
+    box-sizing:border-box;
+    padding:0.5em;
+	margin-bottom:0.8em;
+	background:#f5f5f7;
+}
+#gifeditor-appendImage{
+	text-align:center;
+	user-select:none;
+	cursor:pointer;
+	margin-bottom:0;
+	transition:background 0.1s;
+	padding-top:1.8em;
+}
+#gifeditor-appendImage:hover{
+	background:#f0f0f2;
+}
+#gifeditor-appendImageLabel{
+	font-size:2em;
+}
+.gifeditor-imagesItem{
+	display:flex;
+	min-height:max-content;
+}
+.gifeditor-thumb img{
+	height:70%;
+}
+.gifeditor-imagesItem .info{
+	margin-left:1em;
+}
+.gifeditor-imagesItem b{
+	font-size:1.1em;
+}
+.gifeditor-delete{
+	color:#cc0000;
+	cursor:pointer;
+	font-weight:bold;
+}
+.gifeditor-changeIndex{
+    margin-left:1em;
+    color:blue;
+    text-decoration:underline;
+    cursor:pointer;
+}
+.gifeditor-putData,.gifeditor-dup{
+	color:blue;
+	text-decoration:underline;
+	cursor:pointer;
+}
+.gifeditor-name{
+	width:100%;
+    font-size:0.8em;
+    overflow-x:auto;
+    display:inline-block;
+    white-space:nowrap;
+}
+.gifeditor-thumb{
+	text-align:center;
+    height:100%;
+    overflow:hidden;
+    width:15%;
+}
+@media screen and (max-width: 850px){
+	.gifeditor-imagesColumn{
+		width:100%;
+		height:60%;
+	}
+	.gifeditor-main .group{
+		width:100%;
+	}
+}
+.iconMaker h2,.iconMaker h3{
+	border:none !important;
+	margin-bottom:1em !important;
+}
+#appendDataLog{
+	color:green;
+	font-weight:bold;
+	margin-left:1em;
+}
+#appendDataLog:not(.hiddenLog){
+	visibility:visible;
+	opacity:1;
+}
+.hiddenLog{
+	visibility:hidden;
+	opacity:0;
+	transition:visibility 0s 1.2s,opacity 0.2s 1s;
 }
