@@ -894,7 +894,7 @@ if(document.getElementById("page-iconMaker")){
             });
             if(transparentIndex!==-1){
                 palette=[palette[transparentIndex],...palette.filter(function(color,index){
-                        return index !==transparentIndex;
+                        return index!==transparentIndex;
                     })
                 ];
             }
