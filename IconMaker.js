@@ -916,6 +916,7 @@ if(document.getElementById("page-iconMaker")){
         };
         id("gifeditor-preview").src=blobURL;
     }
+	createGIF();
     async function appendGifData(url,name="image-icon.png",time=""){
         let img=await new Promise(function(resolve){
             let element=new Image();
