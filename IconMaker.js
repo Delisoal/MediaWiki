@@ -10,7 +10,7 @@ if(document.getElementById("page-iconMaker")){
 		link.href="https://cdn.jsdelivr.net/gh/Delisoal/MediaWiki@main/IconMaker.css";
 		link.rel="stylesheet";
 		document.querySelector("head").appendChild(link);
-        ["https://cdn.jsdelivr.net/gh/TakeshiOkamoto/GIFAnime.js/GIFAnime.js","https://cdn.jsdelivr.net/npm/omggif@1.0.10/omggif.js"].forEach(function(url){
+        ["https://cdn.jsdelivr.net/npm/omggif@1.0.10/omggif.js"].forEach(function(url){
             let giftool=document.createElement("script");
             giftool.src=url;
             document.body.appendChild(giftool);
@@ -36,6 +36,7 @@ if(document.getElementById("page-iconMaker")){
     let history=[];
     let historyStep=-1;
     let gifeditorData=[];
+    let gifBlob;
     parentArea.style.display="none";
     parentArea.classList.add("iconMaker");
     form.innerHTML=toInnerHTML(`<div class="group">
@@ -94,7 +95,7 @@ if(document.getElementById("page-iconMaker")){
     <div class="group">
         <div class="meta">使用したライブラリ</div>
         <ul>
-            <li><a href="https://www.petitmonte.com/javascript/howto_gifanime_js.html">GIFAnime.js</a></li>
+            <li><a href="https://github.com/mattdesl/gifenc">gifenc</a></li>
             <li><a href="https://github.com/deanm/omggif">omggif</a></li>
         </ul>
     </div>`);
@@ -651,12 +652,12 @@ if(document.getElementById("page-iconMaker")){
         uploadButton.type="button";
         uploadButton.value="このwikiにアップロード";
         id("downloadImage").after(uploadButton);
-        uploadButton.onclick=async function(){
-            let filename=id("fileName").value+".png";
+        let gifUploadButton=document.createElement("input");
+        gifUploadButton.type="button";
+        gifUploadButton.value="このwikiにアップロード";
+        id("gifeditor-download").after(gifUploadButton);
+        async function wikiUploadFnc(blob,filename){
             if(confirm(`${filename} をアップロードしますか？`)){
-                let blob=await new Promise(function(resolve){
-                    modelCanvas.toBlob(resolve,"image/png");
-                });
                 let api=new mw.Api();
                 try{
                     let result=await new Promise(function(resolve,reject){
@@ -720,6 +721,18 @@ if(document.getElementById("page-iconMaker")){
                     }
                     throw error.error;
                 }
+            }
+        }
+        uploadButton.onclick=async function(){
+            let filename=id("fileName").value+".png";
+            let blob=await new Promise(function(resolve){
+                modelCanvas.toBlob(resolve,"image/png");
+            });
+            wikiUploadFnc(blob,filename);
+        }
+        gifUploadButton.onclick=function(){
+            if(!id("gifeditor-download").disabled){
+                wikiUploadFnc(gifBlob,id("gifeditor-downloadName").value+".gif");
             }
         }
     }
@@ -843,127 +856,65 @@ if(document.getElementById("page-iconMaker")){
             };
         };
     };
-    let timedata=[];
+    let gifencPromise=import("https://cdn.jsdelivr.net/npm/gifenc/+esm");
     async function createGIF(){
         loaded(false);
-        if(gifeditorData.length!=0){
-            let gifsizeData=await Promise.all(gifeditorData.map(function(data){
-                return new Promise(function(resolve){
-                    let img=new Image();
-                    img.src=data.href;
-                    img.onload=function(){
-                        resolve({width:img.width,height:img.height});
-                    };
-                });
-            }));
-            gifsizeData={width:Math.min(...gifsizeData.map(function(data){return data.width})),height:Math.min(...gifsizeData.map(function(data){return data.height}))};
-            let gifimageData=await Promise.all(gifeditorData.map(function(data){
-                return new Promise(function(resolve){
-                    let img=new Image();
-                    img.crossOrigin="anonymous";
-                    img.src=data.href;
-                    img.onload=function(){
-                        resolve([img,data.time]);
-                    };
-                });
-            }));
-            let medianCut;
-            let used=new Set();
-            gifimageData=gifimageData.map(function(imgdata){
-                let gifcanvas=document.createElement("canvas");
-                gifcanvas.width=gifsizeData.width;
-                gifcanvas.height=gifsizeData.height;
-                let ctx=gifcanvas.getContext("2d");
-                ctx.imageSmoothingEnabled=false;
-                ctx.clearRect(0,0,gifcanvas.width,gifcanvas.height);
-                ctx.drawImage(imgdata[0],0,0,imgdata[0].width,imgdata[0].height);
-                let pixels=ctx.getImageData(0,0,gifcanvas.width,gifcanvas.height).data;
-                for(let i=0;i<pixels.length;i+=4){
-                    if(pixels[i+3]!=0){
-                        used.add((pixels[i]<<16)|(pixels[i+1]<<8)|pixels[i+2]);
-                    }
-                }
-                imgdata[2]=ctx.getImageData(0,0,gifcanvas.width,gifcanvas.height);
-                return imgdata;
-            });
-            let step=17;
-            let transparentSearchValue={};
-            for(let r=0;r<256;r+=step){
-                for(let g=0;g<256;g+=step){
-                    for(let b=0;b<256;b+=step){
-                        let color=(r<<16)|(g<<8)|b;
-                        if(!used.has(color)){
-                            transparentSearchValue={rgb:`rgb(${r},${g},${b})`,hex:color,r:r,g:g,b:b};
-                            break;
-                        }
-                    }
-                }
-            }
-            gifwriterData=gifimageData.map(function(imgdata){
-                let gifcanvas=document.createElement("canvas");
-                gifcanvas.width=gifsizeData.width;
-                gifcanvas.height=gifsizeData.height;
-                let ctx=gifcanvas.getContext("2d");
-                ctx.imageSmoothingEnabled=false;
-                ctx.fillStyle=transparentSearchValue.rgb;
-                ctx.fillRect(0,0,gifcanvas.width,gifcanvas.height);
-                ctx.drawImage(imgdata[0],0,0,imgdata[0].width,imgdata[0].height);
-                let delaytime=imgdata[1];
-                let rtdata=gifcanvas.getContext("2d").getImageData(0,0,gifcanvas.width,gifcanvas.height);
-                let colors=getColorInfo(rtdata);
-                if(colors.length>255){
-                    medianCut=new TMedianCut(rtdata,colors);
-                    medianCut.run(255,true);
-                }
-                rtdata["transflg"]=true;
-                rtdata["overlaid"]=2;
-                rtdata["delaytime"]=delaytime*100;
-                if(medianCut){
-                    rtdata["colors"]=medianCut.rep_color;
-                }
-                else{
-                    rtdata["colors"]=colors;
-                }
-                return rtdata;
-            });
-            let GIFWriter=new TGIFAnime(gifwriterData,0);
-            loaded(true);
-            id("gifeditor-download").onclick=function(){            
-                GIFWriter.SaveToFile(id("gifeditor-downloadName").value+".gif",transparentSearchValue.r,transparentSearchValue.g,transparentSearchValue.b);
-            };
-            timedata?timedata.forEach(function(data){
-                clearInterval(data[0]);
-                clearTimeout(data[1]);
-            }):"";
-            gifimageData.forEach(function(imgdata,i){
-                let sum=0;
-                let all=0;
-                for(let num=0;num<i;num++){
-                    sum+=gifimageData[num][1]*1000;
-                }
-                for(let num=0;num<gifimageData.length;num++){
-                    all+=gifimageData[num][1]*1000;
-                }
-                let previewImage=id("gifeditor-preview");
-                previewImage.width=gifsizeData.width;
-                previewImage.height=gifsizeData.height;
-                let rtarray=[];
-                let timeoutdata=setTimeout(function(){
-                    let intervaldata=setInterval(function(){
-                        let gifcanvas=document.createElement("canvas");
-                        gifcanvas.width=gifsizeData.width;
-                        gifcanvas.height=gifsizeData.height;
-                        let ctx=gifcanvas.getContext("2d");
-                        ctx.putImageData(imgdata[2],0,0);
-                        let previewLink=gifcanvas.toDataURL();
-                        previewImage.src=previewLink;
-                    },all);
-                    rtarray[0]=intervaldata;
-                },sum);
-                rtarray[1]=timeoutdata;
-                timedata[timedata.length]=rtarray;
-            });
+        gifBlob="";
+        if (gifeditorData.length==0){
+            return;
         }
+        let {GIFEncoder,quantize,applyPalette}=await gifencPromise;
+        let gifimageData=await Promise.all(gifeditorData.map(function(data){
+                return new Promise(function(resolve,reject){
+                    let img=new Image();
+                    img.src=data.href;
+                    img.onload=function(){
+                        resolve({image:img,time:(data.time||id("gifeditor-defaultSec").value||0.2)});
+                    };
+                    img.onerror=reject;
+                });
+            })
+        );
+        let gifsizeData={width:gifimageData[0].image.width,height:gifimageData[0].image.height};
+        let GIFWriter=GIFEncoder();
+        let previewFrames=[];
+        gifimageData.forEach(function(imgdata,frameIndex){
+            let gifcanvas=document.createElement("canvas");
+            gifcanvas.width=gifsizeData.width;
+            gifcanvas.height=gifsizeData.height;
+            let ctx=gifcanvas.getContext("2d");
+            ctx.imageSmoothingEnabled=false;
+            ctx.clearRect(0,0,gifcanvas.width,gifcanvas.height);
+            ctx.drawImage(imgdata.image,0,0);
+            let rtdata=ctx.getImageData(0,0,gifcanvas.width,gifcanvas.height);
+            previewFrames.push(gifcanvas.toDataURL("image/png"));
+            let palette=quantize(rtdata.data,255,{format:"rgba4444",oneBitAlpha:127,clearAlpha:true,clearAlphaThreshold:127,clearAlphaColor:0});
+            let transparentIndex=palette.findIndex(function(color){
+                return color[3]===0;
+            });
+            if(transparentIndex!==-1){
+                palette=[palette[transparentIndex],...palette.filter(function(color,index){
+                        return index !==transparentIndex;
+                    })
+                ];
+            }
+            else{
+                palette.unshift([0,0,0,0]);
+            }
+            let index=applyPalette(rtdata.data,palette,"rgba4444");
+            GIFWriter.writeFrame(index,gifsizeData.width,gifsizeData.height,{palette:palette,delay:imgdata.time*1000,transparent:true,transparentIndex:0,dispose:2,repeat:frameIndex==0?0:undefined});
+        });
+        GIFWriter.finish();
+        gifBlob=new Blob([GIFWriter.bytes()],{type:"image/gif"});
+        let blobURL=window.URL.createObjectURL(gifBlob);
+        loaded(true);
+        id("gifeditor-download").onclick=function(){
+            let a=document.createElement("a");
+            a.href=blobURL;
+            a.download=id("gifeditor-downloadName").value+".gif";
+            a.click();
+        };
+        id("gifeditor-preview").src=blobURL;
     }
     async function appendGifData(url,name="image-icon.png",time=""){
         let img=await new Promise(function(resolve){
@@ -1074,10 +1025,11 @@ if(document.getElementById("page-iconMaker")){
         await new Promise(function(resolve){setTimeout(resolve,1500)});
         id("appendDataLog").innerHTML="";
     };
-    id("gifeditor-defaultSec").oninput=function(){
+    id("gifeditor-defaultSec").oninput=async function(){
         query(".gifeditor-sec")?.forEach(function(element){
             element.placeholder=id("gifeditor-defaultSec").value||0.2;
         });
+        await createGIF();
     };
     id("page-iconMaker").remove();
 }
