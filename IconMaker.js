@@ -681,6 +681,8 @@ if(document.getElementById("page-iconMaker")){
                     if(apiResult&&apiResult.upload&&apiResult.upload.warnings){
                         let warnings=apiResult.upload.warnings;
                         if(warnings.exists){
+                            gifeditorBG.classList.remove("open");
+                            document.body.style.overflow="";
                             await mw.loader.using(["oojs-ui-windows"]);
                             let dialog=new OO.ui.MessageDialog();
                             let windowManager=new OO.ui.WindowManager();
