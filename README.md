@@ -10,5 +10,6 @@ function addScript(src){
 と記述し、
 ```javascript
 addScript("IconMaker");
+addScript("LinkColor");
 ```
 のように埋め込んでください
